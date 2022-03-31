@@ -14,7 +14,7 @@ jobs:
       - name: Linear update
         uses: ./
         with:
-          linear-key: 'foobar'
+          linear-key: ${{ secrets.LINEAR_API_KEY }}
           linear-team-key: AKS
           github-token: ${{ secrets.GITHUB_TOKEN }}
           state-from: 'Approved'
