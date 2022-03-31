@@ -3,12 +3,13 @@ const esbuild = require('esbuild')
 esbuild
   .build({
     entryPoints: ['src/index.ts'],
-    outdir: 'lib',
+    outdir: 'dist',
     bundle: true,
-    sourcemap: true,
+    sourcemap: false,
     minify: true,
     splitting: false,
     format: 'cjs',
-    target: ['es2015']
+    platform: 'node',
+    target: ['node12']
   })
   .catch(e => (console.error(e), process.exit(1)));

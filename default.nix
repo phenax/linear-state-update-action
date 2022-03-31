@@ -10,6 +10,7 @@ mkShell rec {
     nodePackages.typescript-language-server
     nodePackages.vscode-langservers-extracted
     patchelf
+    act
 
     # Lib
     libclang

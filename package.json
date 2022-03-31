@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "description": "Github action for updating linear status",
   "main": "dist/index.js",
-  "repository": "__",
+  "repository": "https://github.com/phenax/linear-status-update-action",
   "author": "Akshay Nair <phenax5@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "node esbuild.js",
+    "run-local": "act -j linear_update --rebuild",
+    "dev": "yarn build && yarn run-local"
+  },
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.0",

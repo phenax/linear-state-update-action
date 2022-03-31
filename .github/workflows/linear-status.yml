@@ -1,0 +1,21 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+name: Linear status update
+
+jobs:
+  linear_update:
+    name: Update linear status
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Linear update
+        uses: ./
+        with:
+          linear-key: 'foobar'
+          linear-team-key: AKS
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          state-from: 'Approved'
+          state-to: 'Done'
