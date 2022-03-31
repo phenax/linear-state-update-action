@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Linear update
-        uses: phenax/linear-state-update-action@0.1.0
+        uses: phenax/linear-state-update-action@0.1.2
         with:
           linear-api-key: ${{ secrets.LINEAR_API_KEY }}
           linear-team-key: PRO
