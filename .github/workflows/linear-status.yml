@@ -1,9 +1,8 @@
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
-name: Linear status update
+name: Linear status update test
 
 jobs:
   linear_update:
