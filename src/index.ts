@@ -31,7 +31,7 @@ async function main(): Promise<void> {
   }
 
   const result = await Promise.allSettled(issueIds.map(id =>
-    linearClient.issueUpdate(id + '000', { stateId: targetStateId })
+    linearClient.issueUpdate(id, { stateId: targetStateId })
   ))
 
   result.filter(res => res.status !== 'fulfilled').forEach(({ reason }: any) => {
