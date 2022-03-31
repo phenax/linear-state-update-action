@@ -1,0 +1,18 @@
+name: 'GitHub Linear Action'
+description: 'Pushes issue to linear.app through GH Actions'
+inputs:
+  linear-key:
+    description: 'Linear api key'
+    required: true
+  state-from:
+    description: 'The name of the state of issues to search for'
+    required: true
+  state-to:
+    description: 'The name of the state to set the issues to'
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'arrow-up-circle'
+  color: 'purple'
