@@ -13,8 +13,7 @@ jobs:
       - name: Linear update
         uses: ./
         with:
-          linear-key: ${{ secrets.LINEAR_API_KEY }}
+          linear-api-key: ${{ secrets.LINEAR_API_KEY }}
           linear-team-key: AKS
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           state-from: 'Approved'
           state-to: 'Done'

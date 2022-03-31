@@ -20,9 +20,8 @@ jobs:
       - name: Linear update
         uses: phenax/linear-state-update-action@0.1.0
         with:
-          linear-key: ${{ secrets.LINEAR_API_KEY }}
+          linear-api-key: ${{ secrets.LINEAR_API_KEY }}
           linear-team-key: PRO
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           state-from: 'Beta'
           state-to: 'Released'
 ```

@@ -1,11 +1,11 @@
 name: 'Linear update action'
 description: 'Update linear issue state from github'
 inputs:
-  linear-key:
+  linear-api-key:
     description: 'Linear api key'
     required: true
-  linear-team-id:
-    description: 'Linear team id'
+  linear-team-key:
+    description: 'Linear team key - Eg - PRO, MVP, etc'
     required: true
   state-from:
     description: 'The name of the state of issues to search for'

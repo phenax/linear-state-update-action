@@ -1,6 +1,6 @@
 {
   "name": "linear-status-update-action",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Github action for updating linear status",
   "main": "dist/index.js",
   "repository": "https://github.com/phenax/linear-status-update-action",
