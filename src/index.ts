@@ -12,9 +12,11 @@ const createLinearRequest = (query: string) => (variables: any, apiKey: string) 
   },
   body: JSON.stringify({ query, variables }),
 })
+  .then(r => r.json())
+  .then(res => res?.errors ? Promise.reject(res) : res)
 
 const updateState = createLinearRequest(`
-  mutation IssueUpdate($id: uuid!, $stateId: uuid!) {
+  mutation IssueUpdate($id: String!, $stateId: String!) {
     issueUpdate(
       id: $id,
       input: {
@@ -40,7 +42,7 @@ async function main(): Promise<void> {
     stateFrom,
     teamId,
   )
-  const issueIds = (await Promise.all(issueResult.nodes.map((issue) => issue.id))).slice(0, 2)
+  const issueIds = await Promise.all(issueResult.nodes.map((issue) => issue.id))
 
   if (issueIds.length === 0) {
     core.info('No issues found')
