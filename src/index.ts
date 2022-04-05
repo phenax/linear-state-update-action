@@ -2,6 +2,30 @@ import * as core from '@actions/core'
 // import * as github from '@actions/github'
 import * as linear from '@linear/sdk'
 
+const LINEAR_ENDPOINT = 'https://api.linear.app/graphql'
+
+const createLinearRequest = (query: string) => (variables: any, apiKey: string) => fetch(LINEAR_ENDPOINT, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`,
+  },
+  body: JSON.stringify({ query, variables }),
+})
+
+const updateState = createLinearRequest(`
+  mutation IssueUpdate($id: uuid!, $stateId: uuid!) {
+    issueUpdate(
+      id: $id,
+      input: {
+        stateId: $stateId,
+      }
+    ) {
+      success
+    }
+  }
+`)
+
 async function main(): Promise<void> {
   const apiKey: string = core.getInput('linear-api-key')
   const teamId: string = core.getInput('linear-team-key')
@@ -16,7 +40,7 @@ async function main(): Promise<void> {
     stateFrom,
     teamId,
   )
-  const issueIds = await Promise.all(issueResult.nodes.map((issue) => issue.id))
+  const issueIds = (await Promise.all(issueResult.nodes.map((issue) => issue.id))).slice(0, 2)
 
   if (issueIds.length === 0) {
     core.info('No issues found')
@@ -31,12 +55,17 @@ async function main(): Promise<void> {
   }
 
   const result = await Promise.allSettled(issueIds.map(id =>
-    linearClient.issueUpdate(id, { stateId: targetStateId })
+    updateState({ id, stateId: targetStateId }, apiKey)
+    // NOTE: Linear SDK sometimes gives us an internal server error
+    // linearClient.issueUpdate(id, { stateId: targetStateId })
   ))
 
   result.filter(res => res.status !== 'fulfilled').forEach(({ reason }: any) => {
+    console.log(reason.errors)
     core.warning(reason)
   })
+
+  console.log(`Updated ${result.filter(res => res.status === 'fulfilled').length} issues successfully`)
 }
 
 const getStateId = async (linearClient: linear.LinearClient, name: string): Promise<string | undefined> => {
@@ -54,7 +83,7 @@ const loadAllMatchingIssues = async (
       team: { key: { eq: teamId } },
       state: { name: { eq: state } },
     },
-    first: 100,
+    first: 200,
   })
 
   const run = async (
