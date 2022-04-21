@@ -2,32 +2,6 @@ import * as core from '@actions/core'
 // import * as github from '@actions/github'
 import * as linear from '@linear/sdk'
 
-const LINEAR_ENDPOINT = 'https://api.linear.app/graphql'
-
-const createLinearRequest = (query: string) => (variables: any, apiKey: string) => fetch(LINEAR_ENDPOINT, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${apiKey}`,
-  },
-  body: JSON.stringify({ query, variables }),
-})
-  .then(r => r.json())
-  .then(res => res?.errors ? Promise.reject(res) : res)
-
-const updateState = createLinearRequest(`
-  mutation IssueUpdate($id: String!, $stateId: String!) {
-    issueUpdate(
-      id: $id,
-      input: {
-        stateId: $stateId,
-      }
-    ) {
-      success
-    }
-  }
-`)
-
 async function main(): Promise<void> {
   const apiKey: string = core.getInput('linear-api-key')
   const teamId: string = core.getInput('linear-team-key')
@@ -46,32 +20,42 @@ async function main(): Promise<void> {
 
   if (issueIds.length === 0) {
     core.info('No issues found')
-    return;
+    return
   }
 
   core.info(`Updating ${issueIds.length} issues...`)
-  const targetStateId = await getStateId(linearClient, stateTo)
+  const targetStateId = await getStateId(linearClient, stateTo, teamId)
 
   if (!targetStateId) {
     throw new Error('Invalid target state specified')
   }
 
-  const result = await Promise.allSettled(issueIds.map(id =>
-    updateState({ id, stateId: targetStateId }, apiKey)
-    // NOTE: Linear SDK sometimes gives us an internal server error
-    // linearClient.issueUpdate(id, { stateId: targetStateId })
-  ))
+  const results = await Promise.allSettled(
+    issueIds.map((id) =>
+      linearClient.issueUpdate(id, { stateId: targetStateId }),
+    ),
+  )
 
-  result.filter(res => res.status !== 'fulfilled').forEach(({ reason }: any) => {
-    console.log(reason.errors)
+  const failedResults = results.filter((res) => res.status !== 'fulfilled')
+
+  failedResults.forEach(({ reason }: any) => {
+    console.log(JSON.stringify(reason, null, 2))
     core.warning(reason)
   })
 
-  console.log(`Updated ${result.filter(res => res.status === 'fulfilled').length} issues successfully`)
+  const successCount = results.filter((res) => res.status === 'fulfilled').length
+  console.log(`Updated ${successCount} issues successfully. ${failedResults.length} failures`)
 }
 
-const getStateId = async (linearClient: linear.LinearClient, name: string): Promise<string | undefined> => {
-  const targetStateRes = await linearClient.workflowStates({ filter: { name: { eq: name } }, first: 1 })
+const getStateId = async (
+  linearClient: linear.LinearClient,
+  name: string,
+  teamId: string,
+): Promise<string | undefined> => {
+  const targetStateRes = await linearClient.workflowStates({
+    filter: { name: { eq: name }, team: { key: { eq: teamId } } },
+    first: 1,
+  })
   return targetStateRes.nodes[0]?.id
 }
 
