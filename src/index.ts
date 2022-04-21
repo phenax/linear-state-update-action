@@ -3,7 +3,6 @@ import * as core from '@actions/core'
 import * as linear from '@linear/sdk'
 
 async function main(): Promise<void> {
-  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
   const apiKey: string = core.getInput('linear-api-key')
   const teamId: string = core.getInput('linear-team-key')
 
